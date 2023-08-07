@@ -2,7 +2,7 @@
 
 html3pdf.js converts any webpage or element into a printable PDF entirely client-side using [html2canvas](https://github.com/niklasvh/html2canvas) and [jsPDF](https://github.com/MrRio/jsPDF).
 
-This library is a continuation of, and is compatible with the API for, [html2pdf.js](https://github.com/eKoopmans/html2pdf.js) by [Erik Koopmans](https://github.com/eKoopmans)
+This library is a continuation of, and is compatible with the API for, [html2pdf.js](https://github.com/eKoopmans/html2pdf.js) by [Erik Koopmans](https://github.com/eKoopmans).  The majority of this README was written by Erik Koopmans.
 ## Differences from html2pdf.js:
 
 - Dropped support for environments that don't have native Promises.
@@ -40,37 +40,34 @@ This library is a continuation of, and is compatible with the API for, [html2pdf
 
 #### CDN
 
-The simplest way to use html2pdf.js is to include it as a script in your HTML by using cdnjs:
+The simplest way to use html3pdf.js is to include it as a script in your HTML by using cdnjs:
 
 ```html
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="" integrity="" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 ```
+// TODO - add to CDN and add link here
 
-Using a CDN URL will lock you to a specific version, which should ensure stability and give you control over when to change versions. cdnjs gives you access to [all past versions of html2pdf.js](https://cdnjs.com/libraries/html2pdf.js).
 
 *Note: [Read about dependences](#dependencies) for more information about using the unbundled version `dist/html2canvas.min.js`.*
 
 #### Raw JS
 
- You may also download `dist/html2pdf.bundle.min.js` directly to your project folder and include it in your HTML with:
+ You may also download `dist/html3pdf.bundle.min.js` directly to your project folder and include it in your HTML with:
 
 ```html
-<script src="html2pdf.bundle.min.js"></script>
+<script src="html3pdf.bundle.min.js"></script>
 ```
 
 #### NPM
 
-Install html2pdf.js and its dependencies using NPM with `npm install --save html2pdf.js` (make sure to include `.js` in the package name).
+Install html3pdf.js and its dependencies using NPM with `npm install --save html3pdf.js` (make sure to include `.js` in the package name).
 
-*Note: You can use NPM to create your project, but html2pdf.js **will not run in Node.js**, it must be run in a browser.*
+*Note: You can use NPM to create your project, but html3pdf.js **will not run in Node.js**, it must be run in a browser.*
 
-#### Bower
-
-Install html2pdf.js and its dependencies using Bower with `bower install --save html2pdf.js` (make sure to include `.js` in the package name).
 
 #### Console
 
-If you're on a webpage that you can't modify directly and wish to use html2pdf.js to capture a screenshot, you can follow these steps:
+If you're on a webpage that you can't modify directly and wish to use html3pdf.js to capture a screenshot, you can follow these steps:
 
 1. Open your browser's console (instructions for different browsers [here](https://webmasters.stackexchange.com/a/77337/94367)).
 2. Paste in this code:
@@ -81,13 +78,13 @@ If you're on a webpage that you can't modify directly and wish to use html2pdf.j
         script.src = url;
         document.head.appendChild(script);
     }
-    addScript('https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js');
+    addScript('');  // TODO add cdn link here
     ```
-3. You may now execute html2pdf.js commands directly from the console. To capture a default PDF of the entire page, use `html2pdf(document.body)`.
+3. You may now execute html3pdf.js commands directly from the console. To capture a default PDF of the entire page, use `html2pdf(document.body)`.
 
 ## Usage
 
-Once installed, html2pdf.js is ready to use. The following command will generate a PDF of `#element-to-print` and prompt the user to save the result:
+Once installed, html3pdf.js is ready to use. The following command will generate a PDF of `#element-to-print` and prompt the user to save the result:
 
 ```js
 var element = document.getElementById('element-to-print');
@@ -96,7 +93,7 @@ html2pdf(element);
 
 ### Advanced usage
 
-Every step of html2pdf.js is configurable, using its new Promise-based API. If html2pdf.js is called without arguments, it will return a `Worker` object:
+Every step of html3pdf.js is configurable, using a Promise-based API. If html3pdf.js is called without arguments, it will return a `Worker` object:
 
 ```js
 var worker = html2pdf();  // Or:  var worker = new html2pdf.Worker;
@@ -111,7 +108,7 @@ var worker = html2pdf().from(element).save();
 
 #### Workflow
 
-The basic workflow of html2pdf.js tasks (enforced by the prereq system) is:
+The basic workflow of html3pdf.js tasks (enforced by the prereq system) is:
 
 ```
 .from() -> .toContainer() -> .toCanvas() -> .toImg() -> .toPdf() -> .save()
@@ -149,7 +146,7 @@ A few aliases are also provided for convenience:
 
 ## Options
 
-html2pdf.js can be configured using an optional `opt` parameter:
+html3pdf.js can be configured using an optional `opt` parameter:
 
 ```js
 var element = document.getElementById('element-to-print');
@@ -184,9 +181,9 @@ The `opt` parameter has the following optional fields:
 
 ### Page-breaks
 
-html2pdf.js has the ability to automatically add page-breaks to clean up your document. Page-breaks can be added by CSS styles, set on individual elements using selectors, or avoided from breaking inside all elements (`avoid-all` mode).
+html3pdf.js has the ability to automatically add page-breaks to clean up your document. Page-breaks can be added by CSS styles, set on individual elements using selectors, or avoided from breaking inside all elements (`avoid-all` mode).
 
-By default, html2pdf.js will respect most CSS [`break-before`](https://developer.mozilla.org/en-US/docs/Web/CSS/break-before), [`break-after`](https://developer.mozilla.org/en-US/docs/Web/CSS/break-after), and [`break-inside`](https://developer.mozilla.org/en-US/docs/Web/CSS/break-inside) rules, and also add page-breaks after any element with class `html2pdf__page-break` (for legacy purposes).
+By default, html3pdf.js will respect most CSS [`break-before`](https://developer.mozilla.org/en-US/docs/Web/CSS/break-before), [`break-after`](https://developer.mozilla.org/en-US/docs/Web/CSS/break-after), and [`break-inside`](https://developer.mozilla.org/en-US/docs/Web/CSS/break-inside) rules, and also add page-breaks after any element with class `html2pdf__page-break` (for legacy purposes).
 
 #### Page-break settings
 
@@ -255,53 +252,36 @@ The `progressCallback` should be a void function that accepts a single argument,
 
 ## Dependencies
 
-html2pdf.js depends on the external packages [html2canvas](https://github.com/niklasvh/html2canvas), and [jsPDF](https://github.com/MrRio/jsPDF)). These dependencies are automatically loaded when using NPM or the bundled package.
+html3pdf.js depends on the external packages [html2canvas](https://github.com/niklasvh/html2canvas), and [jsPDF](https://github.com/MrRio/jsPDF)). These dependencies are automatically loaded when using NPM or the bundled package.
 
-If using the unbundled `dist/html2pdf.min.js` (or its un-minified version), you must also include each dependency. Order is important, otherwise html2canvas will be overridden by jsPDF's own internal implementation:
+If using the unbundled `dist/html3pdf.min.js` (or its un-minified version), you must also include each dependency. Order is important, otherwise html2canvas will be overridden by jsPDF's own internal implementation:
 
 ```html
 <script src="jspdf.min.js"></script>
-<script src="html2canvas.min.js"></script>
-<script src="html2pdf.min.js"></script>
+<script src="html3canvas.min.js"></script>
+<script src="html3pdf.min.js"></script>
 ```
 
 ## Contributing
 
 ### Issues
 
-When submitting an issue, please provide reproducible code that highlights the issue, preferably by creating a fork of [this template jsFiddle](https://jsfiddle.net/u6o6ne41/) (which has html2pdf.js already loaded). Remember that html2pdf.js uses [html2canvas](https://github.com/niklasvh/html2canvas) and [jsPDF](https://github.com/MrRio/jsPDF) as dependencies, so it's a good idea to check each of those repositories' issue trackers to see if your problem has already been addressed.
+When submitting an issue, please remember that html3pdf.js is a wrapper around [html2canvas](https://github.com/niklasvh/html2canvas) and [jsPDF](https://github.com/MrRio/jsPDF), so it's a good idea to check each of those repositories' issue trackers to see if your problem has already been addressed.
 
 #### Known issues
 
-1. **Rendering:** The rendering engine html2canvas isn't perfect (though it's pretty good!). If html2canvas isn't rendering your content correctly, I can't fix it.
-    - You can test this with something like [this fiddle](https://jsfiddle.net/eKoopmans/z1rupL4c/), to see if there's a problem in the canvas creation itself.
+1. **Rendering:** The rendering engine html2canvas isn't perfect (though it's pretty good!). If html2canvas isn't rendering your content correctly, we can't fix it.
 
-2. **Node cloning (CSS etc):** The way html2pdf.js clones your content before sending to html2canvas is buggy. A fix is currently being developed - try out:
-    - direct file: Go to [html2pdf.js/bugfix/clone-nodes-BUILD](/eKoopmans/html2pdf.js/tree/bugfix/clone-nodes-BUILD) and replace the files in your project with the relevant files (e.g. `dist/html2pdf.bundle.js`)
-    - npm: `npm install eKoopmans/html2pdf.js#bugfix/clone-nodes-BUILD`
-    - Related project: [Bugfix: Cloned nodes](https://github.com/eKoopmans/html2pdf.js/projects/9)
+2. **Node cloning (CSS etc):** The way html3pdf.js clones your content before sending to html2canvas is buggy. A fix was being developed in html2pdf.js
 
-3. **Resizing:** Currently, html2pdf.js resizes the root element to fit onto a PDF page (causing internal content to "reflow").
-    - This is often desired behaviour, but not always.
-    - There are plans to add alternate behaviour (e.g. "shrink-to-page"), but nothing that's ready to test yet.
-    - Related project: [Feature: Single-page PDFs](https://github.com/eKoopmans/html2pdf.js/projects/1)
+3. **Resizing:** Currently, html3pdf.js resizes the root element to fit onto a PDF page (causing internal content to "reflow"). This is often desired behaviour, but not always.
 
-4. **Rendered as image:** html2pdf.js renders all content into an image, then places that image into a PDF.
-    - This means text is *not selectable or searchable*, and causes large file sizes.
-    - This is currently unavoidable, however recent improvements in jsPDF mean that it may soon be possible to render straight into vector graphics.
-    - Related project: [Feature: New renderer](https://github.com/eKoopmans/html2pdf.js/projects/4)
-
-5. **Maximum size:** HTML5 canvases have a [maximum height/width](https://stackoverflow.com/a/11585939/4080966). Anything larger will fail to render.
-    - This is a limitation of HTML5 itself, and results in large PDFs rendering completely blank in html2pdf.js.
-    - The jsPDF canvas renderer (mentioned in Known Issue #4) may be able to fix this issue!
-    - Related project: [Bugfix: Maximum canvas size](https://github.com/eKoopmans/html2pdf.js/projects/5)
+4. **Rendered as image:** html3pdf.js renders all content into an image, then places that image into a PDF.  This means text is *not selectable or searchable*, and causes large file sizes.  This is the unavoidable reality of the html3pdf.js system of using html2canvas to render everything first.  jsPDF may be used as the renderer in the future to avoid this.
 
 ### Tests
-
-html2pdf.js is currently sorely lacking in unit tests. Any contributions or suggestions of automated (or manual) tests are welcome. This is high on the to-do list for this project.
+Any contributions or suggestions of automated (or manual) tests are welcome. This is high on the to-do list for this project.
 
 ### Pull requests
-
 If you want to create a new feature or bugfix, please feel free to fork and submit a pull request! Create a fork, branch off of `master`, and make changes to the `/src/` files (rather than directly to `/dist/`). You can test your changes by rebuilding with `npm run build`.
 
 ## Credits
