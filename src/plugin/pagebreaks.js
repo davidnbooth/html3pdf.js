@@ -51,7 +51,9 @@ Worker.prototype.toContainer = function toContainer() {
   .then(function toContainer_pagebreak() {
     // Setup root element and inner page height.
     var root = this.prop.container;
-    var pxPageHeight = this.opt['html2canvas'] && this.opt['html2canvas']['width'] ? this.opt['html2canvas']['width'] * this.prop.pageSize.inner.ratio : this.prop.pageSize.inner.px.height;
+    var pxPageHeight = this.opt['html2canvas'] && this.opt['html2canvas']['width'] ?
+      this.opt['html2canvas']['width'] * this.prop.pageSize.inner.ratio :
+      this.prop.pageSize.inner.px.heightExact;  // avoid rounding errors by using the exact height in px
 
     // Check all requested modes.
     var modeSrc = [].concat(this.opt.pagebreak.mode);
@@ -128,7 +130,7 @@ Worker.prototype.toContainer = function toContainer() {
         var pad = createElement('div', {style: {
           display: 'block',
           width: '100%',
-          height: pxPageHeight - (clientRect.top % pxPageHeight) + 'px'
+          height: Math.floor(pxPageHeight - (clientRect.top % pxPageHeight)) + 'px'
         }});
         el.parentNode.insertBefore(pad, el);
       }
@@ -138,7 +140,7 @@ Worker.prototype.toContainer = function toContainer() {
         var pad = createElement('div', {style: {
           display: 'block',
           width: '100%',
-          height: pxPageHeight - (clientRect.bottom % pxPageHeight) + 'px'
+          height: Math.floor(pxPageHeight - (clientRect.bottom % pxPageHeight)) + 'px'
         }});
         el.parentNode.insertBefore(pad, el.nextSibling);
       }
