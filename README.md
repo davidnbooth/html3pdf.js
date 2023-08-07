@@ -1,9 +1,8 @@
-# html2pdf.js
+# html3pdf.js
 
-html2pdf.js converts any webpage or element into a printable PDF entirely client-side using [html2canvas](https://github.com/niklasvh/html2canvas) and [jsPDF](https://github.com/MrRio/jsPDF).
+html3pdf.js converts any webpage or element into a printable PDF entirely client-side using [html2canvas](https://github.com/niklasvh/html2canvas) and [jsPDF](https://github.com/MrRio/jsPDF).
 
-> :warning: There have been several issues reported in v0.10. They are being investigated but in the meantime you may wish to remain on v0.9.3 ("^0.9.3" in npm, or [use cdnjs for HTML script tags](https://cdnjs.com/libraries/html2pdf.js/0.9.3)).
-
+This library is a continuation of, and is compatible with the API for, [html2pdf.js](https://github.com/eKoopmans/html2pdf.js) by [Erik Koopmans](https://github.com/eKoopmans)
 ## Table of contents
 
 - [Getting started](#getting-started)
@@ -289,16 +288,7 @@ If you want to create a new feature or bugfix, please feel free to fork and subm
 
 ## Credits
 
-[Erik Koopmans](https://github.com/eKoopmans)
-
-#### Contributors
-
-- [@WilcoBreedt](https://github.com/WilcoBreedt)
-- [@Ranger1230](https://github.com/Ranger1230)
-
-#### Special thanks
-
-- [Sauce Labs](https://saucelabs.com/) for unit testing.
+[Erik Koopmans](https://github.com/eKoopmans), [html2pdf.js](https://github.com/eKoopmans/html2pdf.js), and all other contributors to that project!
 
 ## License
 
