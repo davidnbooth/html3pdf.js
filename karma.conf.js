@@ -85,7 +85,7 @@ module.exports = function(config) {
 
     webpackPreprocessor: {
       output: {
-        library: 'html2pdf',
+        library: 'html3pdf',
         libraryExport: 'default',
       },
       target: 'browserslist',
@@ -107,7 +107,7 @@ module.exports = function(config) {
         base: 'webpack',
         options: {
           output: {},
-          externals: ['html2pdf'],
+          externals: ['html3pdf'],
           externalsType: 'global',
         },
       },

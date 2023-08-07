@@ -46,7 +46,7 @@
 
       function loadPopup () {
         ready.innerHTML = '';
-        _window = window.open(target.value, 'html2pdf testing', 'location=0');
+        _window = window.open(target.value, 'html3pdf testing', 'location=0');
         _window.addEventListener('load', testLoaded);
         _window.focus();
       }
@@ -55,7 +55,7 @@
         var _document = _window.document;
         var script = _document.createElement('script');
         script.addEventListener('load', scriptLoaded);
-        script.src = '../../dist/html2pdf.bundle.js';
+        script.src = '../../dist/html3pdf.bundle.js';
         _document.body.appendChild(script);
       }
 

@@ -1,8 +1,8 @@
 {
-  "name": "@davidnbooth/html2pdf",
+  "name": "html3pdf",
   "version": "0.11.1",
-  "description": "Fork of html2pdf.js by eKoopmans",
-  "main": "dist/html2pdf.js",
+  "description": "html3pdf, based on html2pdf by ekoopmans",
+  "main": "dist/html3pdf.js",
   "files": [
     "/src",
     "/dist"
@@ -64,12 +64,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/davidnbooth/html2pdf.js.git"
+    "url": "git+https://github.com/davidnbooth/html3pdf.js.git"
   },
   "author": "",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/davidnbooth/html2pdf.js/issues"
+    "url": "https://github.com/davidnbooth/html3pdf.js/issues"
   },
-  "homepage": "https://github.com/davidnbooth/html2pdf.js#readme"
+  "homepage": "https://github.com/davidnbooth/html3pdf.js#readme"
 }

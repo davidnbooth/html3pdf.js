@@ -1,13 +1,13 @@
 /*!
- * @davidnbooth/html2pdf v0.11.0
- * Copyright (c) 2023 Erik Koopmans
- * Released under the MIT License.
- */
-
-/*!
  * html2canvas 1.4.1 <https://html2canvas.hertzen.com>
  * Copyright (c) 2022 Niklas von Hertzen <https://hertzen.com>
  * Released under MIT License
+ */
+
+/*!
+ * html3pdf v0.11.1
+ * Copyright (c) 2023 Erik Koopmans
+ * Released under the MIT License.
  */
 
 /*! *****************************************************************************
@@ -25,7 +25,9 @@
     PERFORMANCE OF THIS SOFTWARE.
     ***************************************************************************** */
 
-/*! @license DOMPurify 2.4.4 | (c) Cure53 and other contributors | Released under the Apache license 2.0 and Mozilla Public License 2.0 | github.com/cure53/DOMPurify/blob/2.4.4/LICENSE */
+/*! @license DOMPurify 2.4.7 | (c) Cure53 and other contributors | Released under the Apache license 2.0 and Mozilla Public License 2.0 | github.com/cure53/DOMPurify/blob/2.4.7/LICENSE */
+
+/*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */
 
 /**
  * @license

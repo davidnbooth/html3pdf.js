@@ -29,9 +29,6 @@
             <pre class="prettyprint source linenums"><code>import { jsPDF } from 'jspdf';
 import * as html2canvas from 'html2canvas';
 import { objType, createElement, cloneNode, toPx } from './utils.js';
-import es6promise from 'es6-promise';
-var Promise = es6promise.Promise;
-
 
 /**
  * Converts/casts promises into Workers
@@ -61,7 +58,7 @@ function convert(promise, inherit) {
  * @property {Number} val - The current progress value.
  * @property {String} state - The current progress state.
  * @property {Number} n - The current progress step.
- * @property {Array} stack - The current progress stack.
+ * @property {Array} stack - The current stack of functions to be executed.
  * @property {Number} ratio - The current progress ratio.
  */
 
@@ -93,7 +90,7 @@ var Worker = function Worker(opt) {
     val: 1,
     state: Worker,
     n: 1,
-    stack: [Worker],
+    stack: [],
     ratio: 1 / Worker
   }
   self = self.set(opt);
@@ -112,30 +109,32 @@ Worker.prototype.constructor = Worker;
 * @property {workerOpt} opt
 */
 Worker.template = {
- prop: {
-   src: null,
-   container: null,
-   overlay: null,
-   canvas: null,
-   img: null,
-   pdf: null,
-   pageSize: null
- },
- progress: {
-   val: 0,
-   state: null,
-   n: 0,
-   stack: [],
-   ratio: NaN
- },
- opt: {
-   filename: 'file.pdf',
-   margin: [0,0,0,0],
-   image: { type: 'jpeg', quality: 0.95 },
-   enableLinks: true,
-   html2canvas: {},
-   jsPDF: {}
- }
+  prop: {
+    src: null,
+    container: null,
+    overlay: null,
+    canvas: null,
+    img: null,
+    pdf: null,
+    pageSize: null
+  },
+  progress: {
+    val: 0,
+    state: null,
+    n: 0,
+    stack: [],
+    ratio: NaN,
+    observers: []
+  },
+  opt: {
+    filename: 'file.pdf',
+    margin: [0,0,0,0],
+    image: { type: 'jpeg', quality: 0.95 },
+    enableLinks: true,
+    html2canvas: {},
+    jsPDF: {},
+    documentProperties: {}
+  }
 };
 
 /* ----- FROM / TO ----- */
@@ -430,16 +429,28 @@ Worker.prototype.outputImg = function outputImg(type, options) {
  * @param {string} [filename] optional filename, if not included the jsPDF default will be used
  * @returns {worker} returns itself for chaining.
  */
-Worker.prototype.save = function save(filename) {
+Worker.prototype.save = function save(filename, documentProperties) {
   // Set up function prerequisites.
   var prereqs = [
     function checkPdf() { return this.prop.pdf || this.toPdf(); }
   ];
 
+  var setProps = {};
+  if (filename) {
+    setProps.filename = filename;
+  }
+  if (documentProperties &amp;&amp; Object.keys(documentProperties).length) {
+    setProps.documentProperties = documentProperties
+  }
+
   // Fulfill prereqs, update the filename (if provided), and save the PDF.
   return this.thenList(prereqs).set(
-    filename ? { filename: filename } : null
+    Object.keys(setProps).length ? setProps : null,
   ).then(function save_main() {
+    if (this.opt.documentProperties &amp;&amp; Object.keys(this.opt.documentProperties).length) {
+      this.prop.pdf.setProperties({...this.opt.documentProperties});
+    }
+
     this.prop.pdf.save(this.opt.filename);
   });
 };
@@ -547,8 +558,10 @@ Worker.prototype.setPageSize = function setPageSize(pageSize) {
         height: pageSize.height - this.opt.margin[0] - this.opt.margin[2]
       };
       pageSize.inner.px = {
-        width:  toPx(pageSize.inner.width, pageSize.k),
-        height: toPx(pageSize.inner.height, pageSize.k)
+        width:  toPx(pageSize.inner.width, pageSize.k, true),
+        height: toPx(pageSize.inner.height, pageSize.k, true),
+        widthExact:toPx(pageSize.inner.width, pageSize.k, false),
+        heightExact: toPx(pageSize.inner.height, pageSize.k, false),
       };
       pageSize.inner.ratio = pageSize.inner.height / pageSize.inner.width;
     }
@@ -561,22 +574,30 @@ Worker.prototype.setPageSize = function setPageSize(pageSize) {
 
 /**
  * Update the progress properties of the worker - I believe the goal here is to take the entire promise chain, and after each one resolves, we update the progress properties with how far along the chain we are.
- * @param {number} val ??
+ * @param {number} val current step number
  * @param {*} state ??
- * @param {number} n current progress step
- * @param {Array} stack stack of objects that do something ??
- * @returns {worker} returns itself for chaining.
+ * @param {number} n total number of steps 
  */
-Worker.prototype.updateProgress = function updateProgress(val, state, n, stack) {
+Worker.prototype.updateProgress = function updateProgress(val, state, n) {
   if (val) this.progress.val += val;
   if (state) this.progress.state = state;
   if (n) this.progress.n += n;
-  if (stack) this.progress.stack = this.progress.stack.concat(stack);
-  this.progress.ratio = this.progress.val / this.progress.state;  // This doesn't work right now but it's okay - it just gets set to NaN and isn't used.
-
-  // Return this for command chaining.
-  return this
+  this.progress.ratio = this.progress.val / this.progress.n;
+  for (const observer of this.progress.observers) {
+    observer(this.progress);
+  }
 };
+
+
+/**
+ * Attach a function to listen to progress updates.
+ * @param {Function} cbk the function to register, that will listen to progress updates
+ * @returns {worker} returns itself for chaining.
+ */
+Worker.prototype.listen = function listen(cbk) {
+  this.progress.observers.push(cbk);
+  return this;
+}
 
 /* ----- PROMISE MAPPING ----- */
 
@@ -593,9 +614,12 @@ Worker.prototype.then = function then(onFulfilled, onRejected) {
 
   return this.thenCore(onFulfilled, onRejected, function then_main(onFulfilled, onRejected) {
     // Update progress while queuing, calling, and resolving `then`.
-    self.updateProgress(null, null, 1, [onFulfilled]);
+    self.updateProgress(null, null, 1);
     return Promise.prototype.then.call(this, function then_pre(val) {
-      self.updateProgress(null, onFulfilled);
+      if (onFulfilled) {
+        const funcName = onFulfilled.name.startsWith('bound ') ? onFulfilled.name.slice(6) : onFulfilled.name;
+        self.updateProgress(null, funcName);
+      }
       return val;
     }).then(onFulfilled, onRejected).then(function then_post(val) {
       self.updateProgress(1);
@@ -618,15 +642,16 @@ Worker.prototype.thenCore = function thenCore(onFulfilled, onRejected, thenBase)
 
   // Wrap `this` for encapsulation and bind it to the promise handlers.
   var self = this;
-  if (onFulfilled)  { onFulfilled = onFulfilled.bind(self); }
-  if (onRejected)   { onRejected = onRejected.bind(self); }
-
-  // Cast self into a Promise to avoid polyfills recursively defining `then`.
-  var isNative = Promise.toString().indexOf('[native code]') !== -1 &amp;&amp; Promise.name === 'Promise';
-  var selfPromise = isNative ? self : convert(Object.assign({}, self), Promise.prototype);
+  if (onFulfilled) {
+    this.progress.stack.push(onFulfilled.name)
+    onFulfilled = onFulfilled.bind(self);
+  }
+  if (onRejected) {
+    onRejected = onRejected.bind(self);
+  }
 
   // Return the promise, after casting it into a Worker and preserving props.
-  var returnVal = thenBase.call(selfPromise, onFulfilled, onRejected);
+  var returnVal = thenBase.call(self, onFulfilled, onRejected);
   return convert(returnVal, self.__proto__);
 };
 
@@ -718,7 +743,7 @@ export default Worker;
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Mon Feb 20 2023 11:08:11 GMT-0500 (Eastern Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Mon Aug 07 2023 11:59:30 GMT-0400 (Eastern Daylight Saving Time)
 </footer>
 
 <script> prettyPrint(); </script>

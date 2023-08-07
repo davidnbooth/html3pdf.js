@@ -3,7 +3,7 @@ import { createElement, loadImages } from '../utils.js';
 
 /* Pagebreak plugin:
 
-    Adds page-break functionality to the html2pdf library. Page-breaks can be
+    Adds page-break functionality to the html3pdf library. Page-breaks can be
     enabled by CSS styles, set on individual elements using selectors, or
     avoided from breaking inside all elements.
 

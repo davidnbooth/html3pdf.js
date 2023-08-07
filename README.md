@@ -3,11 +3,12 @@
 html3pdf.js converts any webpage or element into a printable PDF entirely client-side using [html2canvas](https://github.com/niklasvh/html2canvas) and [jsPDF](https://github.com/MrRio/jsPDF).
 
 This library is a continuation of, and is compatible with the API for, [html2pdf.js](https://github.com/eKoopmans/html2pdf.js) by [Erik Koopmans](https://github.com/eKoopmans)
-## NOTES:
+## Differences from html2pdf.js:
 
 - Dropped support for environments that don't have native Promises.
-- Initial implementation of the progress-tracking feature.  I don't think it's quite right, but the basics are there.
-- TO DO: Streamline the implementation of the "one canvas per page" change, and hook this into the progress API.
+- Progress-tracking API implemented.
+- PRs from the original library merged: 170, 260, 261, 340, 447, 503, 516, 531, 569, 635, 641.  These include: some fixes to the pagebreak calculations, the option to change what elements are used for pagebreaks and assign a class to those elements, the addition of the jsPDF documentProperties to the api, and a fix for the bug where long documents are blank - by rendering one canvas per page.
+
 ## Table of contents
 
 - [Getting started](#getting-started)
