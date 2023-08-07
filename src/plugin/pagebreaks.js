@@ -33,7 +33,9 @@ Worker.template.opt.pagebreak = {
   mode: ['css', 'legacy'],
   before: [],
   after: [],
-  avoid: []
+  avoid: [],
+  elementType: 'div',  //default element to create
+  className: ''       //by default no class
 };
 
 Worker.prototype.toContainer = function toContainer() {
@@ -130,11 +132,16 @@ Worker.prototype.toContainer = function toContainer() {
         var height = clientRect.top >= 0
                       ? Math.floor(pxPageHeight - (clientRect.top % pxPageHeight))
                       : Math.abs(clientRect.top);
-        var pad = createElement('div', {style: {
-          display: 'block',
-          width: '100%',
-          height: height + 'px'
-        }});
+        // We allow for creating any type of element in place of the default div
+        // e.g. 'tr' is useful for tables, and there are other cases where a 'div' will ruin the styling
+        var pad = createElement(self.opt.pagebreak.elementType, {style:
+          {
+            display: 'block',
+            width: '100%',
+            height: height + 'px'
+          },
+          className: self.opt.pagebreak.className  // allow control of styling of added sections
+        });
         el.parentNode.insertBefore(pad, el);
       }
 
