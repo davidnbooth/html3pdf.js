@@ -1,6 +1,6 @@
-# html3pdf.js
+# html3pdf
 
-html3pdf.js converts any webpage or element into a printable PDF entirely client-side using [html2canvas](https://github.com/niklasvh/html2canvas) and [jsPDF](https://github.com/MrRio/jsPDF).
+html3pdf converts any webpage or element into a printable PDF entirely client-side using [html2canvas](https://github.com/niklasvh/html2canvas) and [jsPDF](https://github.com/MrRio/jsPDF).
 
 This library is a continuation of, and is compatible with the API for, [html2pdf.js](https://github.com/eKoopmans/html2pdf.js) by [Erik Koopmans](https://github.com/eKoopmans).  The majority of this README was written by Erik Koopmans.
 ## Differences from html2pdf.js:
@@ -45,7 +45,7 @@ Features/Bug fixes:
 
 #### CDN
 
-The simplest way to use html3pdf.js is to include it as a script in your HTML by using cdnjs:
+The simplest way to use html3pdf is to include it as a script in your HTML by using cdnjs:
 
 ```html
 <script src="" integrity="" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -65,14 +65,14 @@ The simplest way to use html3pdf.js is to include it as a script in your HTML by
 
 #### NPM
 
-Install html3pdf.js and its dependencies using NPM with `npm install --save html3pdf.js` (make sure to include `.js` in the package name).
+Install html3pdf and its dependencies using NPM with `npm install --save html3pdf`
 
-*Note: You can use NPM to create your project, but html3pdf.js **will not run in Node.js**, it must be run in a browser.*
+*Note: You can use NPM to create your project, but html3pdf **will not run in Node.js**, it must be run in a browser.*
 
 
 #### Console
 
-If you're on a webpage that you can't modify directly and wish to use html3pdf.js to capture a screenshot, you can follow these steps:
+If you're on a webpage that you can't modify directly and wish to use html3pdf to capture a screenshot, you can follow these steps:
 
 1. Open your browser's console (instructions for different browsers [here](https://webmasters.stackexchange.com/a/77337/94367)).
 2. Paste in this code:
@@ -85,11 +85,11 @@ If you're on a webpage that you can't modify directly and wish to use html3pdf.j
     }
     addScript('');  // TODO add cdn link here
     ```
-3. You may now execute html3pdf.js commands directly from the console. To capture a default PDF of the entire page, use `html2pdf(document.body)`.
+3. You may now execute html3pdf commands directly from the console. To capture a default PDF of the entire page, use `html2pdf(document.body)`.
 
 ## Usage
 
-Once installed, html3pdf.js is ready to use. The following command will generate a PDF of `#element-to-print` and prompt the user to save the result:
+Once installed, html3pdf is ready to use. The following command will generate a PDF of `#element-to-print` and prompt the user to save the result:
 
 ```js
 const element = document.getElementById('element-to-print');
@@ -98,7 +98,7 @@ html2pdf(element);
 
 ### Advanced usage
 
-Every step of html3pdf.js is configurable, using a Promise-based API. If html3pdf.js is called without arguments, it will return a `Worker` object:
+Every step of html3pdf is configurable, using a Promise-based API. If html3pdf is called without arguments, it will return a `Worker` object:
 
 ```js
 const worker = html2pdf();  // Or:  const worker = new html2pdf.Worker;
@@ -113,10 +113,10 @@ const worker = html2pdf().from(element).save();
 
 #### Workflow
 
-The basic workflow of html3pdf.js tasks (enforced by the prereq system) is:
+The basic workflow of html3pdf tasks (enforced by the prereq system) is:
 
 ```
-// The default in html3pdf.js
+// The default in html3pdf
 .from() -> .toContainer() -> .toCanvases() -> .toImgs() -> .toPdf() -> .save()
 
 // The default in html2pdf.js
@@ -161,7 +161,7 @@ A few aliases are also provided for convenience:
 
 ## Options
 
-html3pdf.js can be configured using an optional `opt` parameter:
+html3pdf can be configured using an optional `opt` parameter:
 
 ```js
 const element = document.getElementById('element-to-print');
@@ -196,9 +196,9 @@ The `opt` parameter has the following optional fields:
 
 ### Page-breaks
 
-html3pdf.js has the ability to automatically add page-breaks to clean up your document. Page-breaks can be added by CSS styles, set on individual elements using selectors, or avoided from breaking inside all elements (`avoid-all` mode).
+html3pdf has the ability to automatically add page-breaks to clean up your document. Page-breaks can be added by CSS styles, set on individual elements using selectors, or avoided from breaking inside all elements (`avoid-all` mode).
 
-By default, html3pdf.js will respect most CSS [`break-before`](https://developer.mozilla.org/en-US/docs/Web/CSS/break-before), [`break-after`](https://developer.mozilla.org/en-US/docs/Web/CSS/break-after), and [`break-inside`](https://developer.mozilla.org/en-US/docs/Web/CSS/break-inside) rules, and also add page-breaks after any element with class `html2pdf__page-break` (for legacy purposes).
+By default, html3pdf will respect most CSS [`break-before`](https://developer.mozilla.org/en-US/docs/Web/CSS/break-before), [`break-after`](https://developer.mozilla.org/en-US/docs/Web/CSS/break-after), and [`break-inside`](https://developer.mozilla.org/en-US/docs/Web/CSS/break-inside) rules, and also add page-breaks after any element with class `html2pdf__page-break` (for legacy purposes).
 
 #### Page-break settings
 
@@ -267,7 +267,7 @@ The `progressCallback` should be a void function that accepts a single argument,
 
 ## Dependencies
 
-html3pdf.js depends on the external packages [html2canvas](https://github.com/niklasvh/html2canvas), and [jsPDF](https://github.com/MrRio/jsPDF)). These dependencies are automatically loaded when using NPM or the bundled package.
+html3pdf depends on the external packages [html2canvas](https://github.com/niklasvh/html2canvas), and [jsPDF](https://github.com/MrRio/jsPDF)). These dependencies are automatically loaded when using NPM or the bundled package.
 
 If using the unbundled `dist/html3pdf.min.js` (or its un-minified version), you must also include each dependency. Order is important, otherwise html2canvas will be overridden by jsPDF's own internal implementation:
 
@@ -281,17 +281,17 @@ If using the unbundled `dist/html3pdf.min.js` (or its un-minified version), you 
 
 ### Issues
 
-When submitting an issue, please remember that html3pdf.js is a wrapper around [html2canvas](https://github.com/niklasvh/html2canvas) and [jsPDF](https://github.com/MrRio/jsPDF), so it's a good idea to check each of those repositories' issue trackers to see if your problem has already been addressed.
+When submitting an issue, please remember that html3pdf is a wrapper around [html2canvas](https://github.com/niklasvh/html2canvas) and [jsPDF](https://github.com/MrRio/jsPDF), so it's a good idea to check each of those repositories' issue trackers to see if your problem has already been addressed.
 
 #### Known issues
 
 1. **Rendering:** The rendering engine html2canvas isn't perfect (though it's pretty good!). If html2canvas isn't rendering your content correctly, we can't fix it.
 
-2. **Node cloning (CSS etc):** The way html3pdf.js clones your content before sending to html2canvas is buggy. A fix was being developed in html2pdf.js
+2. **Node cloning (CSS etc):** The way html3pdf clones your content before sending to html2canvas is buggy. A fix was being developed in html2pdf.js
 
-3. **Resizing:** Currently, html3pdf.js resizes the root element to fit onto a PDF page (causing internal content to "reflow"). This is often desired behaviour, but not always.
+3. **Resizing:** Currently, html3pdf resizes the root element to fit onto a PDF page (causing internal content to "reflow"). This is often desired behaviour, but not always.
 
-4. **Rendered as image:** html3pdf.js renders all content into an image, then places that image into a PDF.  This means text is *not selectable or searchable*, and causes large file sizes.  This is the unavoidable reality of the html3pdf.js system of using html2canvas to render everything first.  jsPDF may be used as the renderer in the future to avoid this.
+4. **Rendered as image:** html3pdf renders all content into an image, then places that image into a PDF.  This means text is *not selectable or searchable*, and causes large file sizes.  This is the unavoidable reality of the html3pdf system of using html2canvas to render everything first.  jsPDF may be used as the renderer in the future to avoid this.
 
 ### Tests
 Any contributions or suggestions of automated (or manual) tests are welcome. This is high on the to-do list for this project.
