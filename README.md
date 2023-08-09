@@ -5,8 +5,13 @@ html3pdf.js converts any webpage or element into a printable PDF entirely client
 This library is a continuation of, and is compatible with the API for, [html2pdf.js](https://github.com/eKoopmans/html2pdf.js) by [Erik Koopmans](https://github.com/eKoopmans).  The majority of this README was written by Erik Koopmans.
 ## Differences from html2pdf.js:
 
+Breaking changes:
 - Dropped support for environments that don't have native Promises.
-- Progress-tracking API implemented.
+- Previously if you called the `.toPdf()` method of the html2pdf.js object, without explicitly calling `.toCanvas()` or `.toImg()`, the default worker object would have the properties `.prop.canvas` and `.prop.img`, which would be an HTMLCanvasElement and an HTMLImageElement respectively.  Now the default types are Array\<HTMLCanvasElement> and Array\<HTMLImageElement>.  If you do not want them to be arrays, you can explicitly call `.toCanvas()` and `.toImg()`.  See [Workflow](#workflow) below for more details.  This is a niche use case and if you don't know what any of this means, you probably don't need to worry about it.
+
+Features/Bug fixes:
+- [Progress tracking](#progress-tracking) API implemented.
+- `.toCanvases()` and `.toImgs()` added to the worker API as alternatives to the original `.toCanvas()` and `.toImg()` methods.  These are now the default if you simply call `.toPdf()` without being explicit about the rest of the chain.  These functions create one canvas per page, and the corresponding images for each canvas.  This resolves the issues with canvas size limits (unless each page is enormous).
 - PRs from the original library merged: 170, 260, 261, 340, 447, 503, 516, 531, 569, 635, 641.  These include: some fixes to the pagebreak calculations, the option to change what elements are used for pagebreaks and assign a class to those elements, the addition of the jsPDF documentProperties to the api, and a fix for the bug where long documents are blank - by rendering one canvas per page.
 
 ## Table of contents
@@ -73,7 +78,7 @@ If you're on a webpage that you can't modify directly and wish to use html3pdf.j
 2. Paste in this code:
     ```js
     function addScript(url) {
-        var script = document.createElement('script');
+        const script = document.createElement('script');
         script.type = 'application/javascript';
         script.src = url;
         document.head.appendChild(script);
@@ -87,7 +92,7 @@ If you're on a webpage that you can't modify directly and wish to use html3pdf.j
 Once installed, html3pdf.js is ready to use. The following command will generate a PDF of `#element-to-print` and prompt the user to save the result:
 
 ```js
-var element = document.getElementById('element-to-print');
+const element = document.getElementById('element-to-print');
 html2pdf(element);
 ```
 
@@ -96,14 +101,14 @@ html2pdf(element);
 Every step of html3pdf.js is configurable, using a Promise-based API. If html3pdf.js is called without arguments, it will return a `Worker` object:
 
 ```js
-var worker = html2pdf();  // Or:  var worker = new html2pdf.Worker;
+const worker = html2pdf();  // Or:  const worker = new html2pdf.Worker;
 ```
 
 This worker has methods that can be chained sequentially, as each Promise resolves, and allows insertion of your own intermediate functions between steps. A prerequisite system allows you to skip over mandatory steps (like canvas creation) without any trouble:
 
 ```js
-// This will implicitly create the canvas and PDF objects before saving.
-var worker = html2pdf().from(element).save();
+// This will implicitly create the canvases and PDF objects before saving.
+const worker = html2pdf().from(element).save();
 ```
 
 #### Workflow
@@ -111,15 +116,25 @@ var worker = html2pdf().from(element).save();
 The basic workflow of html3pdf.js tasks (enforced by the prereq system) is:
 
 ```
+// The default in html3pdf.js
+.from() -> .toContainer() -> .toCanvases() -> .toImgs() -> .toPdf() -> .save()
+
+// The default in html2pdf.js
 .from() -> .toContainer() -> .toCanvas() -> .toImg() -> .toPdf() -> .save()
+
+// You can also call .toImgs() after calling toCanvas(), it will just have an array with one image.
+.from() -> .toContainer() -> .toCanvas() -> .toImgs() -> .toPdf() -> .save()
+
+// But you can't call `.toImg` if you previously called `.toCanvases` on the same worker, `.toImg` does not want to assemble a single image out of multiple canvases.  If you need this for some reason, feel free to submit a PR!
 ```
+
 
 #### Worker API
 
 | Method       | Arguments          | Description |
 |--------------|--------------------|-------------|
 | from         | src, type          | Sets the source (HTML string or element) for the PDF. Optional `type` specifies other sources: `'string'`, `'element'`, `'canvas'`, or `'img'`. |
-| to           | target             | Converts the source to the specified target (`'container'`, `'canvas'`, `'img'`, or `'pdf'`). Each target also has its own `toX` method that can be called directly: `toContainer()`, `toCanvas()`, `toImg()`, and `toPdf()`. |
+| to           | target             | Converts the source to the specified target (`'container'`, `'canvas'`,  `'canvases'`, `'img'`, `'imgs'`, or `'pdf'`). Each target also has its own `toX` method that can be called directly: `toContainer()`, `toCanvas()`, `toCanvases()`, `toImg()`, `toImgs()`, and `toPdf()`. |
 | output       | type, options, src | Routes to the appropriate `outputPdf` or `outputImg` method based on specified `src` (`'pdf'` (default) or `'img'`). |
 | outputPdf    | type, options      | Sends `type` and `options` to the jsPDF object's `output` method, and returns the result as a Promise (use `.then` to access). See the [jsPDF documentation](https://rawgit.com/MrRio/jsPDF/master/docs/jsPDF.html#output) for more info. |
 | outputImg    | type, options      | Returns the specified data type for the image as a Promise (use `.then` to access). Supported types: `'img'`, `'datauristring'`/`'dataurlstring'`, and `'datauri'`/`'dataurl'`. |
@@ -149,8 +164,8 @@ A few aliases are also provided for convenience:
 html3pdf.js can be configured using an optional `opt` parameter:
 
 ```js
-var element = document.getElementById('element-to-print');
-var opt = {
+const element = document.getElementById('element-to-print');
+const opt = {
   margin:             1,
   filename:           'myFile.pdf',
   image:              { type: 'jpeg', quality: 0.98 },

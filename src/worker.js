@@ -19,8 +19,8 @@ function convert(promise, inherit) {
  * @property {HTMLElement} src - The source HTML element.
  * @property {HTMLElement} container - The container element.
  * @property {HTMLElement} overlay - The overlay element.
- * @property {HTMLCanvasElement} canvas - The canvas element.
- * @property {HTMLImageElement} img - The image element.
+ * @property {Array<HTMLCanvasElement>|HTMLCanvasElement} canvas - The canvas element(s).
+ * @property {Array<HTMLImageElement>|HTMLImageElement} img - The image element(s).
  * @property {jsPDF} pdf - The jsPDF object.
  * @property {Array} pageSize - The page size.
  */
@@ -69,7 +69,7 @@ const Worker = function Worker(opt) {
   return self;
 };
 
-// Boilerplate for subclassing Promise.
+// Boilerplate to subclass Promise.
 Worker.prototype = Object.create(Promise.prototype);
 Worker.prototype.constructor = Worker;
 
@@ -145,21 +145,24 @@ Worker.prototype.from = function from(src, type) {
  * Wrapper for toContainer, toCanvas, toImg, and toPdf.
  * 
  * How the 'to' system works:
- * To create the pdf, we create a container element, convert it to a canvas, convert the canvas to an image, and then convert the image to a pdf.
- * Therefore, .toContainer, .toCanvas, .toImg, and .toPdf must all be called, in that order.
+ * To create the pdf, we create a container element, convert it to canvases/a canvas, convert the canvas(es) to image(s), and then convert the image(s) to a pdf.
+ * Therefore, .toContainer, .toCanvases/.toCanvas, .toImgs/.toImg, and .toPdf must all be called, in that order.
  * To create a user-friendly API, we do not require the user to call all four functions.
  * Instead, there is a "prereq" system:
  * Each function has a list of prereq functions, which are passed into the .thenList() function, and THEN the main function is passed into .then().
  * Each prereq function checks to see if its condition is met, and if not, it returns a promise to run the necessary function, which gets put on the chain by .thenList
  * 
- * @param {"container"|"canvas"|"img"|"pdf"} target
+ * @param {"container"|"canvases"|"imgs"|"canvas"|"img"|"pdf"} target
  * @returns {worker} returns itself for chaining.
- */
-Worker.prototype.to = function to(target) {
+ */Worker.prototype.to = function to(target) {
   // Route the 'to' request to the appropriate method.
   switch (target) {
     case 'container':
       return this.toContainer();
+    case 'canvases':
+      return this.toCanvases();
+    case 'imgs':
+      return this.toImgs();
     case 'canvas':
       return this.toCanvas();
     case 'img':
@@ -215,7 +218,7 @@ Worker.prototype.toContainer = function toContainer() {
 
 
 /**
- * Creates a canvas element from the container element, by calling html2canvas.
+ * Creates a canvas element from the container element by calling html2canvas.
  * removes the overlay div from the body when done.
  * @returns {worker} returns itself for chaining.
  */
@@ -266,58 +269,107 @@ Worker.prototype.toImg = function toImg() {
 
 
 /**
- * Creates the pdf by setting this.prop.pdf to a new jsPDF object, splitting the canvas into pages, and adding each page to the pdf using the jspdf addImage function.
+ * Creates an array of canvas elements (one per page) from the container element, by calling html2canvas.
+ * removes the overlay div from the body when done.
+ * @returns {worker} returns itself for chaining.
+ */
+Worker.prototype.toCanvases = function toCanvases() {
+  // Set up function prerequisites.
+  const prereqs = [
+    function checkContainer() { return document.body.contains(this.prop.container) || this.toContainer(); }
+  ];
+
+  // Fulfill prereqs then create the canvases.
+  return this.thenList(prereqs).then(async function toCanvases_main() {
+    const opt = this.opt;
+    const root = this.prop.container;
+    const pxPageWidth = this.prop.pageSize.inner.px.width;
+    const pxPageHeight = this.prop.pageSize.inner.px.height;
+
+    const clientBoundingRect = root.getBoundingClientRect();
+
+    const pxFullHeight = clientBoundingRect.height;
+    const nPages = Math.ceil(pxFullHeight / pxPageHeight);
+
+    opt.html2canvas.width = pxPageWidth;
+    opt.html2canvas.height = pxPageHeight;
+    opt.html2canvas.windowWidth = pxPageWidth;
+    opt.html2canvas.windowHeight = pxPageHeight;
+
+    if (!this.prop.canvas) {
+      this.prop.canvas = [];
+    }
+
+    for (let page = 0; page < nPages; page++) {
+      const options = Object.assign({}, opt.html2canvas);
+      delete options.onrendered;
+
+      options.x = 0;
+      // Increase the y value to capture only the 'current' page
+      // -1 to be exclusive to the current page's content
+      options.y = page * (pxPageHeight - 1);
+
+      const canvas = await html2canvas(this.prop.container, options);
+      this.prop.canvas.push(canvas);
+    }
+
+    document.body.removeChild(this.prop.overlay);
+  });
+};
+
+
+/**
+ * Converts the canvases to images by setting the data URLs as the src of new image elements.
+ * @returns {worker} returns itself for chaining.
+ */
+Worker.prototype.toImgs = function toImgs() {
+  // Set up function prerequisites.
+  const prereqs = [
+    function checkCanvases() { return this.prop.canvas || this.toCanvases(); }
+  ];
+
+  // Fulfill prereqs then create the image.
+  return this.thenList(prereqs).then(function toImgs_main() {
+    if (!this.prop.imgs) {
+      this.prop.imgs = [];
+    }
+
+    // This function should still work even if .toCanvas was run previously instead of .toCanvases
+    const canvases = this.prop.canvas instanceof Array ? this.prop.canvas : [this.prop.canvas];
+
+    for (const canvas of canvases) {
+      const img = document.createElement('img');
+      const imgData = canvas.toDataURL('image/' + this.opt.image.type, this.opt.image.quality);
+      img.src = imgData;
+      this.prop.imgs.push(img);
+    }
+  });
+};
+
+
+/**
+ * Creates the pdf by setting this.prop.pdf to a new jsPDF object, and adding each page to the pdf using the jspdf addImage function.
  * @returns {worker} returns itself for chaining.
  */
 Worker.prototype.toPdf = function toPdf() {
   // Set up function prerequisites.
   const prereqs = [
-    function checkCanvas() { return this.prop.canvas || this.toCanvas(); }
+    function checkImg() { return this.prop.img || this.toImgs(); }
   ];
 
   // Fulfill prereqs then create the image.
   return this.thenList(prereqs).then(function toPdf_main() {
-    // Create local copies of frequently used properties.
-    const canvas = this.prop.canvas;
-    const opt = this.opt;
-
-    // Calculate the number of pages.
-    const pxFullHeight = canvas.height;
-    const pxPageHeight = Math.floor(canvas.width * this.prop.pageSize.inner.ratio);
-    const nPages = Math.ceil(pxFullHeight / pxPageHeight);
-
-    // Define pageHeight separately so it can be trimmed on the final page.
-    let pageHeight = this.prop.pageSize.inner.height;
-
-    // Create a one-page canvas to split up the full image.
-    const pageCanvas = document.createElement('canvas');
-    const pageCtx = pageCanvas.getContext('2d');
-    pageCanvas.width = canvas.width;
-    pageCanvas.height = pxPageHeight;
+    // Should work with either a single image or an array of images
+    const imgs = this.prop.imgs instanceof Array ? this.prop.imgs : [this.prop.img];
 
     // Initialize the PDF.
-    this.prop.pdf = this.prop.pdf || new jsPDF(opt.jsPDF);
+    this.prop.pdf = this.prop.pdf || new jsPDF(this.opt.jsPDF);
 
-    for (let page=0; page<nPages; page++) {
-      // Trim the final page to reduce file size.
-      if (page === nPages-1 && pxFullHeight % pxPageHeight !== 0) {
-        pageCanvas.height = pxFullHeight % pxPageHeight;
-        pageHeight = pageCanvas.height * this.prop.pageSize.inner.width / pageCanvas.width;
-      }
-
-      // Display the page.
-      const w = pageCanvas.width;
-      const h = pageCanvas.height;
-      pageCtx.fillStyle = 'white';
-      pageCtx.fillRect(0, 0, w, h);
-      pageCtx.drawImage(canvas, 0, page*pxPageHeight, w, h, 0, 0, w, h);
-
-      // Add the page to the PDF.
-      if (page)  this.prop.pdf.addPage();
-      const imgData = pageCanvas.toDataURL('image/' + opt.image.type, opt.image.quality);
-      this.prop.pdf.addImage(imgData, opt.image.type, opt.margin[1], opt.margin[0],
-        this.prop.pageSize.inner.width, pageHeight);
+    for (const img of imgs) {
+      this.prop.pdf.addPage();
+      this.prop.pdf.addImage(img.src, this.opt.image.type, this.opt.margin[1], this.opt.margin[0], this.prop.pageSize.inner.width, this.prop.pageSize.inner.height);
     }
+
   });
 };
 
@@ -498,11 +550,15 @@ Worker.prototype.setMargin = function setMargin(margin) {
     switch (objType(margin)) {
       case 'number':
         margin = [margin, margin, margin, margin];
+        break;
       case 'array':
         if (margin.length === 2) {
           margin = [margin[0], margin[1], margin[0], margin[1]];
-        }
-        if (margin.length === 4) {
+          break;
+        } else if (margin.length === 4) {
+          break;
+        } else {
+          return this.error('Invalid margin array.');
         }
       default:
         return this.error('Invalid margin array.');
@@ -546,7 +602,7 @@ Worker.prototype.setPageSize = function setPageSize(pageSize) {
 
 
 /**
- * Update the progress properties of the worker - I believe the goal here is to take the entire promise chain, and after each one resolves, we update the progress properties with how far along the chain we are.
+ * Update the progress properties of the worker - we take the entire promise chain and after each one resolves we update the progress properties with how far along the chain we are.
  * @param {number} val current step number
  * @param {*} state ??
  * @param {number} n total number of steps 
