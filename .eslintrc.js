@@ -32,6 +32,7 @@ module.exports = {
     ],
     'no-var' : ['error'],
     'prefer-const' : ['error'],
+    'no-unused-vars' : ['warn'],
     'eqeqeq' : ['error']
   },
   'globals': {
