@@ -1,7 +1,13 @@
 // Import dependencies.
 import { jsPDF } from 'jspdf';
 
-// Get dimensions of a PDF page, as determined by jsPDF.
+/**
+ * Get dimensions of a PDF page, as determined by jsPDF.
+ * @param {string} orientation - Page orientation, either 'p' or 'l'.
+ * @param {string} unit - Measurement unit to use, either 'pt', 'mm', 'cm', 'in'.
+ * @param {string|array} format - Page format, either 'a0'-'a10', 'b0'-'b10', 'c0'-'c10', 'dl', 'letter', 'government-letter', 'legal', 'junior-legal', 'ledger', 'tabloid', 'credit-card' or an array containing the width and height in points (1/72nd of an inch).
+ * @returns {{width: number, height: number, unit: string, k: number}} Page dimensions.
+ */
 jsPDF.getPageSize = function(orientation, unit, format) {
   // Decode options object
   if (typeof orientation === 'object') {

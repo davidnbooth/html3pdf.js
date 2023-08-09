@@ -641,7 +641,7 @@ Worker.prototype.thenExternal = function thenExternal(onFulfilled, onRejected) {
 
 /**
  * Queue a series of promise 'factories' into the promise chain.
- * @param {Function[]} fns array of functions that may return promises, to add to the promise chain.
+ * @param {Array<Function>} fns array of functions that may return promises, to add to the promise chain.
  * @returns {worker} returns itself for chaining.
  */
 Worker.prototype.thenList = function thenList(fns) {

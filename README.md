@@ -48,7 +48,7 @@ The simplest way to use html3pdf.js is to include it as a script in your HTML by
 // TODO - add to CDN and add link here
 
 
-*Note: [Read about dependences](#dependencies) for more information about using the unbundled version `dist/html2canvas.min.js`.*
+*Note: [Read about dependencies](#dependencies) for more information about using the unbundled version `dist/html2canvas.min.js`.*
 
 #### Raw JS
 
@@ -152,7 +152,7 @@ html3pdf.js can be configured using an optional `opt` parameter:
 var element = document.getElementById('element-to-print');
 var opt = {
   margin:             1,
-  filename:           'myfile.pdf',
+  filename:           'myFile.pdf',
   image:              { type: 'jpeg', quality: 0.98 },
   html2canvas:        { scale: 2 },
   jsPDF:              { unit: 'in', format: 'letter', orientation: 'portrait' }
@@ -174,7 +174,7 @@ The `opt` parameter has the following optional fields:
 |filename    |string          |`'file.pdf'`                    |The default filename of the exported PDF.                                                                   |
 |pagebreak   |object          |`{mode: ['css', 'legacy']}`     |Controls the pagebreak behaviour on the page. See [Page-breaks](#page-breaks) below.                        |
 |image       |object          |`{type: 'jpeg', quality: 0.95}` |The image type and quality used to generate the PDF. See [Image type and quality](#image-type-and-quality) below.|
-|enableLinks |boolean         |`true`                          |If enabled, PDF hyperlinks are automatically added ontop of all anchor tags.                                |
+|enableLinks |boolean         |`true`                          |If enabled, PDF hyperlinks are automatically added on top of all anchor tags.                                |
 |html2canvas |object          |`{ }`                           |Configuration options sent directly to `html2canvas` ([see here](https://html2canvas.hertzen.com/configuration) for usage).|
 |jsPDF       |object          |`{ }`                           |Configuration options sent directly to `jsPDF` ([see here](http://rawgit.com/MrRio/jsPDF/master/docs/jsPDF.html) for usage).|
 |documentProperties |object |`{ }` | Configuration options applied directly to `jsPDF` pdf ([see here](https://www.rotisedapsales.com/snr/cloud_staging/website/jsPDF-master/docs/global.html#setProperties) for usage).

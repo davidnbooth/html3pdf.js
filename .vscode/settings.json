@@ -1,0 +1,28 @@
+{
+    "search.exclude": {
+        "**/dist": true,
+        "**/docs": true
+    },
+    "cSpell.words": [
+        "behaviour",
+        "bloburi",
+        "bloburl",
+        "corejs",
+        "datauri",
+        "datauristring",
+        "dataurl",
+        "dataurlnewwindow",
+        "dataurlstring",
+        "divs",
+        "ekoopmans",
+        "jspdf",
+        "Koopmans",
+        "onrendered",
+        "pagebreak",
+        "pagebreaks",
+        "pdftest",
+        "prereq",
+        "prereqs",
+        "webp"
+    ]
+}
