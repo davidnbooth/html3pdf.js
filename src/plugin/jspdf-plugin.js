@@ -11,7 +11,7 @@ import { jsPDF } from 'jspdf';
 jsPDF.getPageSize = function(orientation, unit, format) {
   // Decode options object
   if (typeof orientation === 'object') {
-    var options = orientation;
+    const options = orientation;
     orientation = options.orientation;
     unit = options.unit || unit;
     format = options.format || format;
@@ -21,10 +21,10 @@ jsPDF.getPageSize = function(orientation, unit, format) {
   unit        = unit || 'mm';
   format      = format || 'a4';
   orientation = ('' + (orientation || 'P')).toLowerCase();
-  var format_as_string = ('' + format).toLowerCase();
+  const format_as_string = ('' + format).toLowerCase();
 
   // Size in pt of various paper formats
-  var pageFormats = {
+  const pageFormats = {
     'a0'  : [2383.94, 3370.39], 'a1'  : [1683.78, 2383.94],
     'a2'  : [1190.55, 1683.78], 'a3'  : [ 841.89, 1190.55],
     'a4'  : [ 595.28,  841.89], 'a5'  : [ 419.53,  595.28],
@@ -52,27 +52,30 @@ jsPDF.getPageSize = function(orientation, unit, format) {
   };
 
   // Unit conversion
+  let k;
   switch (unit) {
-    case 'pt':  var k = 1;          break;
-    case 'mm':  var k = 72 / 25.4;  break;
-    case 'cm':  var k = 72 / 2.54;  break;
-    case 'in':  var k = 72;         break;
-    case 'px':  var k = 72 / 96;    break;
-    case 'pc':  var k = 12;         break;
-    case 'em':  var k = 12;         break;
-    case 'ex':  var k = 6;          break;
+    case 'pt':  k = 1;          break;
+    case 'mm':  k = 72 / 25.4;  break;
+    case 'cm':  k = 72 / 2.54;  break;
+    case 'in':  k = 72;         break;
+    case 'px':  k = 72 / 96;    break;
+    case 'pc':  k = 12;         break;
+    case 'em':  k = 12;         break;
+    case 'ex':  k = 6;          break;
     default:
       throw ('Invalid unit: ' + unit);
   }
 
   // Dimensions are stored as user units and converted to points on output
-  if (pageFormats.hasOwnProperty(format_as_string)) {
-    var pageHeight = pageFormats[format_as_string][1] / k;
-    var pageWidth = pageFormats[format_as_string][0] / k;
+  let pageHeight;
+  let pageWidth
+  if (Object.prototype.hasOwnProperty.call(pageFormats, format_as_string)) {
+    pageHeight = pageFormats[format_as_string][1] / k;
+    pageWidth = pageFormats[format_as_string][0] / k;
   } else {
     try {
-      var pageHeight = format[1];
-      var pageWidth = format[0];
+      pageHeight = format[1];
+      pageWidth = format[0];
     } catch (err) {
       throw new Error('Invalid format: ' + format);
     }
@@ -82,14 +85,14 @@ jsPDF.getPageSize = function(orientation, unit, format) {
   if (orientation === 'p' || orientation === 'portrait') {
     orientation = 'p';
     if (pageWidth > pageHeight) {
-      var tmp = pageWidth;
+      const tmp = pageWidth;
       pageWidth = pageHeight;
       pageHeight = tmp;
     }
   } else if (orientation === 'l' || orientation === 'landscape') {
     orientation = 'l';
     if (pageHeight > pageWidth) {
-      var tmp = pageWidth;
+      const tmp = pageWidth;
       pageWidth = pageHeight;
       pageHeight = tmp;
     }
@@ -98,7 +101,7 @@ jsPDF.getPageSize = function(orientation, unit, format) {
   }
 
   // Return information (k is the unit conversion ratio from pts)
-  var info = { 'width': pageWidth, 'height': pageHeight, 'unit': unit, 'k': k };
+  const info = { 'width': pageWidth, 'height': pageHeight, 'unit': unit, 'k': k };
   return info;
 };
 

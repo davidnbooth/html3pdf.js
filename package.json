@@ -29,6 +29,7 @@
     "chai": "^4.3.7",
     "chai-spies": "^1.0.0",
     "commander": "^11.0.0",
+    "eslint": "^8.46.0",
     "jsdoc": "^4.0.2",
     "karma": "^6.4.2",
     "karma-chai": "^0.1.0",

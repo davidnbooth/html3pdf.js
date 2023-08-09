@@ -4,7 +4,7 @@
  * @returns {"undefined"|"string"|"number"|"function"|"array"|"element"|"object"|"unknown"} The type of the object.
  */ 
 export const objType = function objType(obj) {
-  var type = typeof obj;
+  const type = typeof obj;
   if (type === 'undefined')                                 return 'undefined';
   else if (type === 'string' || obj instanceof String)      return 'string';
   else if (type === 'number' || obj instanceof Number)      return 'number';
@@ -26,16 +26,16 @@ export const objType = function objType(obj) {
  * @returns {Element} The created element.
  */
 export const createElement = function createElement(tagName, opt) {
-  var el = document.createElement(tagName);
+  const el = document.createElement(tagName);
   if (opt.className)  el.className = opt.className;
   if (opt.innerHTML) {
     el.innerHTML = opt.innerHTML;
-    var scripts = el.getElementsByTagName('script');
-    for (var i = scripts.length; i-- > 0; null) {
+    const scripts = el.getElementsByTagName('script');
+    for (let i = scripts.length; i-- > 0; null) {
       scripts[i].parentNode.removeChild(scripts[i]);
     }
   }
-  for (var key in opt.style) {
+  for (const key in opt.style) {
     el.style[key] = opt.style[key];
   }
   return el;
@@ -50,8 +50,8 @@ export const createElement = function createElement(tagName, opt) {
  */
 export const cloneNode = function cloneNode(node, javascriptEnabled) {
   // Recursively clone the node.
-  var clone = node.nodeType === 3 ? document.createTextNode(node.nodeValue) : node.cloneNode(false);
-  for (var child = node.firstChild; child; child = child.nextSibling) {
+  const clone = node.nodeType === 3 ? document.createTextNode(node.nodeValue) : node.cloneNode(false);
+  for (let child = node.firstChild; child; child = child.nextSibling) {
     if (javascriptEnabled === true || child.nodeType !== 1 || child.nodeName !== 'SCRIPT') {
       clone.appendChild(cloneNode(child, javascriptEnabled));
     }
@@ -89,8 +89,8 @@ export const unitConvert = function unitConvert(obj, k) {
   if (objType(obj) === 'number') {
     return obj * 72 / 96 / k;
   } else {
-    var newObj = {};
-    for (var key in obj) {
+    const newObj = {};
+    for (const key in obj) {
       newObj[key] = obj[key] * 72 / 96 / k;
     }
     return newObj;
@@ -109,33 +109,33 @@ export const toPx = function toPx(val, k, floor = true) {
 }
 
 
-// make sure all images finish loading (even though some of them failed to load) then fire the callback
+/**
+ * make sure all images finish loading (even if some of them failed to load) then fire the callback
+ * @param {Array<HTMLImageElement>} images 
+ * @returns {Promise<void>} resolves when the images are loaded
+ */
 export function loadImages(images) {
-  if (images.length > 0) {
-    var loadedImages = 0;
-    var promiseResolve;
+  if (!images.length)
+    return
 
-    var promise = new Promise(function (resolve) {
-      promiseResolve = resolve;
-    });
-
-    images.forEach(function wait_images_loading(img) {
-      var newImg = new Image();
-
+  return new Promise(resolve => {
+    let loadedImages = 0;
+  
+    images.forEach(function wait_image_loading(img) {
+      const newImg = new Image();
+  
       const onFinishLoading = function () {
         loadedImages++;
         if (loadedImages === images.length) {
-          promiseResolve();
+          resolve();
         }
       };
-
+  
       newImg.onload = onFinishLoading;
       newImg.onerror = onFinishLoading;
   
-      var src = img.getAttribute("src");
+      const src = img.getAttribute('src');
       newImg.src = src;
     });
-
-    return promise;
-  }
+  });
 }

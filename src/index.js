@@ -13,9 +13,9 @@ import './plugin/hyperlinks.js';
  *    sent as settings to their corresponding functions.
  * @returns {worker}
  */
-var html2pdf = function html2pdf(src, opt) {
+const html2pdf = function html2pdf(src, opt) {
   // Create a new worker with the given options.
-  var worker = new html2pdf.Worker(opt);
+  const worker = new html2pdf.Worker(opt);
 
   if (src) {
     // If src is specified, perform the traditional 'simple' operation.
