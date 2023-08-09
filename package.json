@@ -1,6 +1,6 @@
 {
   "name": "html3pdf",
-  "version": "0.12.1",
+  "version": "0.12.2",
   "description": "html3pdf, based on html2pdf by ekoopmans",
   "main": "dist/html3pdf.js",
   "files": [
